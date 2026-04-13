@@ -27,7 +27,20 @@ class Transaction(db.Model):
     type = db.Column(db.String(10), nullable=False)  # 'Income' or 'Expense'
     category = db.Column(db.String(50), nullable=False)
     amount = db.Column(db.Float, nullable=False)
+    # Adding date helps with monthly reporting
     date = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+@app.route('/api/analytics', methods=['GET'])
+def get_analytics():
+    # Grouping expenses by category for a chart
+    results = db.session.query(
+        Transaction.category,
+        db.func.sum(Transaction.amount)
+    ).filter(Transaction.type == 'Expense').group_by(Transaction.category).all()
+
+    breakdown = {cat: amt for cat, amt in results}
+    return jsonify(breakdown)
 
 # --- API ROUTES ---
 
@@ -36,6 +49,10 @@ class Transaction(db.Model):
 def get_summary():
     try:
         assets = Asset.query.all()
+        # Fetch all transactions, newest first
+        transactions = Transaction.query.order_by(
+            Transaction.date.desc()).all()
+
         income = db.session.query(db.func.sum(Transaction.amount)).filter(
             Transaction.type == 'Income').scalar() or 0
         expenses = db.session.query(db.func.sum(Transaction.amount)).filter(
@@ -45,7 +62,14 @@ def get_summary():
             "profit": income - expenses,
             "total_income": income,
             "total_expenses": expenses,
-            "assets": [{"id": a.id, "name": a.name, "price": a.purchase_price, "status": a.status} for a in assets]
+            "assets": [{"id": a.id, "name": a.name, "price": a.purchase_price, "status": a.status} for a in assets],
+            "transactions": [{
+                "id": t.id,
+                "type": t.type,
+                "category": t.category,
+                "amount": t.amount,
+                "date": t.date.strftime("%Y-%m-%d %H:%M")
+            } for t in transactions]
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500

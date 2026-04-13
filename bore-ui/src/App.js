@@ -80,6 +80,73 @@ function App() {
             <button type="submit" style={{ padding: '12px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px' }}>Save</button>
           </form>
         </div>
+        {/* Add this inside your return() after the Summary Cards */}
+        <div style={{ padding: '20px', backgroundColor: 'white', borderRadius: '12px', marginBottom: '30px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
+          <h3>Financial Health Indicators</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-around', textAlign: 'center' }}>
+            <div>
+              <p style={{ color: '#6b7280', margin: 0 }}>Profit Margin</p>
+              <h4 style={{ fontSize: '24px', margin: '10px 0' }}>
+                {data.total_income > 0
+                  ? ((data.profit / data.total_income) * 100).toFixed(1)
+                  : 0}%
+              </h4>
+            </div>
+            <div style={{ borderLeft: '1px solid #eee', paddingLeft: '20px' }}>
+              <p style={{ color: '#6b7280', margin: 0 }}>Expense Ratio</p>
+              <h4 style={{ fontSize: '24px', margin: '10px 0' }}>
+                {data.total_income > 0
+                  ? ((data.total_expenses / data.total_income) * 100).toFixed(1)
+                  : 0}%
+              </h4>
+            </div>
+          </div>
+        </div>
+        {/* TRANSACTION HISTORY TABLE */}
+        <div style={{ marginTop: '30px', backgroundColor: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <div style={{ padding: '20px', borderBottom: '1px solid #f3f4f6' }}>
+            <h3 style={{ margin: 0 }}>Transaction Ledger</h3>
+          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead style={{ backgroundColor: '#f9fafb' }}>
+              <tr>
+                <th style={{ padding: '15px', textAlign: 'left' }}>Date</th>
+                <th style={{ padding: '15px', textAlign: 'left' }}>Category</th>
+                <th style={{ padding: '15px', textAlign: 'left' }}>Type</th>
+                <th style={{ padding: '15px', textAlign: 'right' }}>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.transactions && data.transactions.length > 0 ? data.transactions.map((t) => (
+                <tr key={t.id} style={{ borderBottom: '1px solid #eee' }}>
+                  <td style={{ padding: '15px', color: '#6b7280', fontSize: '14px' }}>{t.date}</td>
+                  <td style={{ padding: '15px', fontWeight: '500' }}>{t.category}</td>
+                  <td style={{ padding: '15px' }}>
+                    <span style={{
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      backgroundColor: t.type === 'Income' ? '#d1fae5' : '#fee2e2',
+                      color: t.type === 'Income' ? '#065f46' : '#991b1b'
+                    }}>
+                      {t.type}
+                    </span>
+                  </td>
+                  <td style={{
+                    padding: '15px',
+                    textAlign: 'right',
+                    fontWeight: 'bold',
+                    color: t.type === 'Income' ? '#10b981' : '#ef4444'
+                  }}>
+                    {t.type === 'Income' ? '+' : '-'}${t.amount.toLocaleString()}
+                  </td>
+                </tr>
+              )) : (
+                <tr><td colSpan="4" style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>No transactions recorded yet.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
         {/* ASSET FORM */}
         <div style={{ padding: '20px', backgroundColor: 'white', borderRadius: '12px' }}>
