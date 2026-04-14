@@ -9,8 +9,8 @@ CORS(app)
 
 # --- SUPABASE DATABASE CONNECTION ---
 # Using the password you provided to connect to your live PostgreSQL instance
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:!Kipchirchir98.@db.wrplorywgbaszimyodjv.supabase.co:5432/postgres'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# The '!' becomes '%21' and the '.' at the end becomes '%2e'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:%21Kipchirchir98%2e@db.wrplorywgbaszimyodjv.supabase.co:5432/postgres'app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
