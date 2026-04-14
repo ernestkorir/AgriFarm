@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Wallet, Tractor, TrendingUp } from 'lucide-react';
-// Automatically switches between Local and Production URLs
+
+// Switches between local development and your Vercel URL automatically
 const API_BASE = window.location.hostname === "localhost"
   ? "http://127.0.0.1:5000/api"
   : "/api";
@@ -20,7 +21,7 @@ function App() {
       const res = await axios.get(`${API_BASE}/summary`);
       setData(res.data);
     } catch (err) {
-      console.error("Connection Error. Ensure backend is running.");
+      console.error("Connection Error:", err);
     }
   };
 
@@ -30,7 +31,7 @@ function App() {
       await axios.post(`${API_BASE}/transaction`, txForm);
       setTxForm({ ...txForm, category: '', amount: '' });
       fetchData();
-    } catch (err) { alert("Failed to log transaction."); }
+    } catch (err) { alert("Failed to log transaction. Check internet connection."); }
   };
 
   const handleAssetSubmit = async (e) => {
@@ -46,10 +47,9 @@ function App() {
     <div style={{ padding: '30px', backgroundColor: '#f9fafb', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       <header style={{ marginBottom: '30px' }}>
         <h1 style={{ margin: 0, color: '#111827' }}>Bore AgriFarm</h1>
-        <p style={{ color: '#6b7280' }}>Financial Management System | Super User</p>
+        <p style={{ color: '#6b7280' }}>Financial Management System | Cloud Sync Active</p>
       </header>
 
-      {/* TOP STATS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '30px' }}>
         <StatCard title="Net Profit" value={`$${data.profit.toLocaleString()}`} color={data.profit >= 0 ? '#10b981' : '#ef4444'} icon={<Wallet />} />
         <StatCard title="Income" value={`$${data.total_income.toLocaleString()}`} color="#2563eb" icon={<TrendingUp />} />
@@ -57,30 +57,27 @@ function App() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '30px' }}>
-        {/* FINANCE FORM */}
         <Section title="Log Transaction">
           <form onSubmit={handleTransaction} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <select value={txForm.type} onChange={e => setTxForm({ ...txForm, type: e.target.value })} style={inputStyle}>
-              <option value="Expense">Expense (Paying Out)</option>
+              <option value="Expense">Expense</option>
               <option value="Income">Income (Sale)</option>
             </select>
             <input type="text" placeholder="Category" value={txForm.category} onChange={e => setTxForm({ ...txForm, category: e.target.value })} style={inputStyle} required />
             <input type="number" placeholder="Amount" value={txForm.amount} onChange={e => setTxForm({ ...txForm, amount: e.target.value })} style={inputStyle} required />
-            <button type="submit" style={{ ...btnStyle, backgroundColor: '#2563eb' }}>Record Transaction</button>
+            <button type="submit" style={{ ...btnStyle, backgroundColor: '#2563eb' }}>Save</button>
           </form>
         </Section>
 
-        {/* ASSET FORM */}
-        <Section title="Register Machinery">
+        <Section title="Register Asset">
           <form onSubmit={handleAssetSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <input type="text" placeholder="Machine Name" value={assetForm.name} onChange={e => setAssetForm({ ...assetForm, name: e.target.value })} style={inputStyle} required />
-            <input type="number" placeholder="Purchase Price" value={assetForm.purchase_price} onChange={e => setAssetForm({ ...assetForm, purchase_price: e.target.value })} style={inputStyle} required />
+            <input type="number" placeholder="Price" value={assetForm.purchase_price} onChange={e => setAssetForm({ ...assetForm, purchase_price: e.target.value })} style={inputStyle} required />
             <button type="submit" style={{ ...btnStyle, backgroundColor: '#059669' }}>Add Asset</button>
           </form>
         </Section>
       </div>
 
-      {/* TRANSACTION LEDGER */}
       <Section title="Transaction Ledger">
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
@@ -108,7 +105,6 @@ function App() {
   );
 }
 
-// --- STYLED COMPONENTS ---
 const StatCard = ({ title, value, color, icon }) => (
   <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#6b7280', marginBottom: '10px' }}>{icon} {title}</div>
@@ -123,9 +119,9 @@ const Section = ({ title, children }) => (
   </div>
 );
 
-const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '14px' };
+const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid #d1d5db' };
 const btnStyle = { padding: '12px', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '600' };
-const thStyle = { padding: '12px', color: '#6b7280', fontSize: '14px', fontWeight: 'normal' };
-const tdStyle = { padding: '12px', fontSize: '14px' };
+const thStyle = { padding: '12px', color: '#6b7280', fontWeight: 'normal' };
+const tdStyle = { padding: '12px' };
 
 export default App;

@@ -7,12 +7,11 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)
 
-# --- DYNAMIC DATABASE PATHING ---
-# This ensures the DB is created in the same folder as this script (the 'api' folder)
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
-    os.path.join(basedir, 'bore_farm.db')
+# --- SUPABASE DATABASE CONNECTION ---
+# Using the password you provided to connect to your live PostgreSQL instance
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:!Kipchirchir98.@db.wrplorywgbaszimyodjv.supabase.co:5432/postgres'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 
 # --- MODELS ---
@@ -94,9 +93,9 @@ def add_asset():
 
 
 # --- INITIALIZATION ---
+# This creates the tables in Supabase if they don't exist yet
+with app.app_context():
+    db.create_all()
+
 if __name__ == '__main__':
-    with app.app_context():
-        print("Initializing Bore Database...")
-        db.create_all()
-        print(f"Database location: {os.path.join(basedir, 'bore_farm.db')}")
     app.run(port=5000, debug=True)
