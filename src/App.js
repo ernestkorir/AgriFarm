@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Wallet, Tractor, PlusCircle, TrendingUp, TrendingDown, ClipboardList } from 'lucide-react';
-
+import { Wallet, Tractor, TrendingUp } from 'lucide-react';
 // Automatically switches between Local and Production URLs
 const API_BASE = window.location.hostname === "localhost"
   ? "http://127.0.0.1:5000/api"
