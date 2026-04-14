@@ -1,16 +1,22 @@
 import os
+from urllib.parse import quote_plus  # Add this import
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
 
-# --- SUPABASE DATABASE CONNECTION ---
-# Using the password you provided to connect to your live PostgreSQL instance
-# The '!' becomes '%21' and the '.' at the end becomes '%2e'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:%21Kipchirchir98%2e@db.wrplorywgbaszimyodjv.supabase.co:5432/postgres'app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# 1. Define your credentials separately
+user = "postgres"
+password = quote_plus("!Kipchirchir98.")  # This cleans the password safely
+host = "db.wrplorywgbaszimyodjv.supabase.co"
+port = "5432"
+dbname = "postgres"
+
+# 2. Construct the URI using the cleaned password
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{user}:{password}@{host}:{port}/{dbname}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
