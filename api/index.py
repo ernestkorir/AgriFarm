@@ -1,14 +1,17 @@
+import os
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import datetime
 
 app = Flask(__name__)
-# Standardizing CORS to allow your React app (localhost:3000) to communicate
 CORS(app)
 
-# Database Setup
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///bore_farm.db'
+# --- DYNAMIC DATABASE PATHING ---
+# This ensures the DB is created in the same folder as this script (the 'api' folder)
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
+    os.path.join(basedir, 'bore_farm.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -27,29 +30,15 @@ class Transaction(db.Model):
     type = db.Column(db.String(10), nullable=False)  # 'Income' or 'Expense'
     category = db.Column(db.String(50), nullable=False)
     amount = db.Column(db.Float, nullable=False)
-    # Adding date helps with monthly reporting
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
-
-@app.route('/api/analytics', methods=['GET'])
-def get_analytics():
-    # Grouping expenses by category for a chart
-    results = db.session.query(
-        Transaction.category,
-        db.func.sum(Transaction.amount)
-    ).filter(Transaction.type == 'Expense').group_by(Transaction.category).all()
-
-    breakdown = {cat: amt for cat, amt in results}
-    return jsonify(breakdown)
-
-# --- API ROUTES ---
+# --- ROUTES ---
 
 
 @app.route('/api/summary', methods=['GET'])
 def get_summary():
     try:
         assets = Asset.query.all()
-        # Fetch all transactions, newest first
         transactions = Transaction.query.order_by(
             Transaction.date.desc()).all()
 
@@ -64,11 +53,8 @@ def get_summary():
             "total_expenses": expenses,
             "assets": [{"id": a.id, "name": a.name, "price": a.purchase_price, "status": a.status} for a in assets],
             "transactions": [{
-                "id": t.id,
-                "type": t.type,
-                "category": t.category,
-                "amount": t.amount,
-                "date": t.date.strftime("%Y-%m-%d %H:%M")
+                "id": t.id, "type": t.type, "category": t.category,
+                "amount": t.amount, "date": t.date.strftime("%Y-%m-%d %H:%M")
             } for t in transactions]
         })
     except Exception as e:
@@ -107,7 +93,10 @@ def add_asset():
         return jsonify({"error": str(e)}), 400
 
 
+# --- INITIALIZATION ---
 if __name__ == '__main__':
     with app.app_context():
+        print("Initializing Bore Database...")
         db.create_all()
+        print(f"Database location: {os.path.join(basedir, 'bore_farm.db')}")
     app.run(port=5000, debug=True)
