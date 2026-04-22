@@ -46,8 +46,8 @@ function App() {
   return (
     <div style={{ padding: '30px', backgroundColor: '#f9fafb', minHeight: '100vh', fontFamily: 'sans-serif' }}>
       <header style={{ marginBottom: '30px' }}>
-        <h1 style={{ margin: 0, color: '#111827' }}>Bore AgriFarm</h1>
-        <p style={{ color: '#6b7280' }}>Financial Management System | Cloud Sync Active</p>
+        <h1 style={{ margin: 0, color: '#111827' }}>Bore AgriBuz</h1>
+        <p style={{ color: '#6b7280' }}>Financial Management System</p>
       </header>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '30px' }}>
