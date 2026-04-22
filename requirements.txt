@@ -1,4 +1,5 @@
 Flask
 Flask-SQLAlchemy
 Flask-CORS
-Psycopg2-binary
+psycopg2-binary
+serverless-wsgi
