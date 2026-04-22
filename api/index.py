@@ -1,4 +1,5 @@
 import os
+from urllib.parse import quote_plus  # Add this import
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
@@ -7,12 +8,17 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)
 
-# --- DYNAMIC DATABASE PATHING ---
-# This ensures the DB is created in the same folder as this script (the 'api' folder)
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
-    os.path.join(basedir, 'bore_farm.db')
+# 1. Define your credentials separately
+user = "postgres"
+password = quote_plus("!Kipchirchir98.")  # This cleans the password safely
+host = "db.wrplorywgbaszimyodjv.supabase.co"
+port = "5432"
+dbname = "postgres"
+
+# 2. Construct the URI using the cleaned password
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{user}:{password}@{host}:{port}/{dbname}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 
 # --- MODELS ---
@@ -94,9 +100,9 @@ def add_asset():
 
 
 # --- INITIALIZATION ---
+# This creates the tables in Supabase if they don't exist yet
+with app.app_context():
+    db.create_all()
+
 if __name__ == '__main__':
-    with app.app_context():
-        print("Initializing Bore Database...")
-        db.create_all()
-        print(f"Database location: {os.path.join(basedir, 'bore_farm.db')}")
     app.run(port=5000, debug=True)
